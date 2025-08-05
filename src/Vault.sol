@@ -27,14 +27,22 @@ contract Vault {
     }
 
     function redeem(uint256 _amount) external {
-        if (_amount < s_amountDeposited[msg.sender]) {
+        if (_amount == type(uint256).max) {
+            _amount = i_token.balanceOf(msg.sender);
+        }
+        if (_amount > s_amountDeposited[msg.sender]) {
             revert Vault__CannotRedeemMoreThanDeposited();
         }
+
         s_amountDeposited[msg.sender] -= _amount;
         i_token.burn(msg.sender, _amount);
         (bool success,) = payable(msg.sender).call{value: _amount}("");
         if (!success) {
             revert Vault__RedeemFailed();
         }
+    }
+
+    function getDepositAmount(address _user) external view returns (uint256) {
+        return s_amountDeposited[_user];
     }
 }

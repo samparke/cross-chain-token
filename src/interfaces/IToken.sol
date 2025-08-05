@@ -5,5 +5,5 @@ interface IToken {
     function mint(address user, uint256 amount) external;
     function burn(address user, uint256 amount) external;
     function grantMintAndBurnRole(address user) external;
-    function balanceOf(address user) external;
+    function balanceOf(address user) external view returns (uint256);
 }
