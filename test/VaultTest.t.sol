@@ -2,13 +2,13 @@
 pragma solidity ^0.8.24;
 
 import {Test} from "forge-std/Test.sol";
-import {Token} from "../src/Token.sol";
-import {IToken} from "../src/interfaces/IToken.sol";
+import {Coin} from "../src/Coin.sol";
+import {ICoin} from "../src/interfaces/ICoin.sol";
 import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
 import {Vault} from "../src/Vault.sol";
 
 contract VaultTest is Test {
-    Token token;
+    Coin coin;
     Vault vault;
     address user = makeAddr("user");
     uint256 public constant STARTING_USER_BALANCE = 100 ether;
@@ -20,25 +20,25 @@ contract VaultTest is Test {
     }
 
     function setUp() public {
-        token = new Token();
-        token.grantMintAndBurnRole(address(this));
-        vault = new Vault(IToken(address(token)));
-        token.grantMintAndBurnRole(address(vault));
+        coin = new coin();
+        coin.grantMintAndBurnRole(address(this));
+        vault = new Vault(ICoin(address(coin)));
+        coin.grantMintAndBurnRole(address(vault));
         vm.deal(user, STARTING_USER_BALANCE);
     }
 
     // deposit
-    function testDepositIncreasesUserTokenBalance() public {
-        uint256 userTokensBeforeDeposit = token.balanceOf(user);
-        assertEq(userTokensBeforeDeposit, 0);
+    function testDepositIncreasesUsercoinBalance() public {
+        uint256 userCoinsBeforeDeposit = coin.balanceOf(user);
+        assertEq(userCoinsBeforeDeposit, 0);
         vm.prank(user);
 
         vm.expectEmit(true, false, false, true);
         emit Vault.Vault__Deposit(user, 1 ether);
         vault.deposit{value: 1 ether}();
         assertEq(vault.getDepositAmount(user), 1 ether);
-        uint256 userTokensAfterDeposit = token.balanceOf(user);
-        assertEq(userTokensAfterDeposit, 1 ether);
+        uint256 userCoinsAfterDeposit = coin.balanceOf(user);
+        assertEq(userCoinsAfterDeposit, 1 ether);
     }
 
     // redeem
