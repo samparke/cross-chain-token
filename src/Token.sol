@@ -8,7 +8,7 @@ import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC2
 
 contract Token is ERC20, Ownable, ERC20Burnable, AccessControl {
     error Token__MustBeMoreThanZero();
-    error Token__BurnAmountMustExceedBalance();
+    error Token__BalanceMustExceedOrMatchBurnAmount();
 
     bytes32 public constant MINT_AND_BURN_ROLE = keccak256("MINT_AND_BURN_ROLE");
 
@@ -22,17 +22,17 @@ contract Token is ERC20, Ownable, ERC20Burnable, AccessControl {
     constructor() ERC20("Token", "TKN") Ownable(msg.sender) {}
 
     function grantMintAndBurnRole(address _user) external onlyOwner {
-        grantRole(MINT_AND_BURN_ROLE, _user);
+        _grantRole(MINT_AND_BURN_ROLE, _user);
     }
 
-    function mint(address _user, uint256 _amount) public onlyOwner mustBeMoreThanZero(_amount) {
+    function mint(address _user, uint256 _amount) external onlyRole(MINT_AND_BURN_ROLE) mustBeMoreThanZero(_amount) {
         _mint(_user, _amount);
     }
 
-    function burn(uint256 _amount) public override mustBeMoreThanZero(_amount) {
-        if (balanceOf(msg.sender) < _amount) {
-            revert Token__BurnAmountMustExceedBalance();
+    function burn(address _user, uint256 _amount) external onlyRole(MINT_AND_BURN_ROLE) mustBeMoreThanZero(_amount) {
+        if (balanceOf(_user) < _amount) {
+            revert Token__BalanceMustExceedOrMatchBurnAmount();
         }
-        super.burn(_amount);
+        _burn(_user, _amount);
     }
 }
