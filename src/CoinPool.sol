@@ -14,7 +14,6 @@ import {Vault} from "./Vault.sol";
  */
 contract CoinPool is TokenPool {
     /**
-     *
      * @notice these are the parameters to send through to the token pool
      */
     constructor(IERC20 _token, address[] memory _allowList, address _rmnProxy, address _routerAddress)

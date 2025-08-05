@@ -11,6 +11,7 @@ contract Coin is ERC20, Ownable, ERC20Burnable, AccessControl {
     error Coin__BalanceMustExceedOrMatchBurnAmount();
 
     bytes32 public constant MINT_AND_BURN_ROLE = keccak256("MINT_AND_BURN_ROLE");
+    address internal immutable i_ccipAdmin;
 
     modifier mustBeMoreThanZero(uint256 _amount) {
         if (_amount == 0) {
@@ -34,5 +35,9 @@ contract Coin is ERC20, Ownable, ERC20Burnable, AccessControl {
             revert Coin__BalanceMustExceedOrMatchBurnAmount();
         }
         _burn(_user, _amount);
+    }
+
+    function getCCIPAdmin() public view returns (address) {
+        return i_ccipAdmin;
     }
 }
